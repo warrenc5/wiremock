@@ -75,13 +75,30 @@ class HostParser implements CharSequenceParser<Host> {
       return host;
     }
 
+    private static final Pattern pctPattern = Pattern.compile("%[0-9a-fA-F]{2}");
+
     @Override
     public org.wiremock.url.Host normalise() {
-      var lowerCase = host.toLowerCase(Locale.ROOT);
-      if (lowerCase.equals(host)) {
+      StringBuilder result = new StringBuilder();
+      Matcher matcher = pctPattern.matcher(host);
+      int lastEnd = 0;
+
+      while (matcher.find()) {
+        // Lowercase the part before the percent-encoded sequence
+        result.append(host.substring(lastEnd, matcher.start()).toLowerCase(Locale.ROOT));
+        // Uppercase the percent-encoded sequence
+        result.append(matcher.group().toUpperCase(Locale.ROOT));
+        lastEnd = matcher.end();
+      }
+
+      // Lowercase the remaining part
+      result.append(host.substring(lastEnd).toLowerCase(Locale.ROOT));
+
+      String normalised = result.toString();
+      if (normalised.equals(host)) {
         return this;
       } else {
-        return new Host(lowerCase);
+        return new Host(normalised);
       }
     }
   }
