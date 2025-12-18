@@ -38,6 +38,7 @@ import org.jspecify.annotations.NonNull;
 @JsonIgnoreProperties({
   "$schema", "uuid"
 }) // $schema allows this to be added as a hint to IDEs like VS Code
+@JsonInclude(Include.NON_NULL)
 public final class StubMapping implements StubMappingOrMappings {
 
   public static final int DEFAULT_PRIORITY = 5;
